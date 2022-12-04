@@ -21,7 +21,7 @@ cursor.execute("DROP DATABASE IF EXISTS `jogoteca`;")
 cursor.execute("CREATE DATABASE `jogoteca`;")
 
 cursor.execute("USE `jogoteca`;")
-
+#?
 # criando tabelas
 TABLES = {}
 TABLES['Jogos'] = ('''

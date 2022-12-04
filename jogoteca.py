@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, session, flash, url
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-
+#?
 
 
 app.secret_key = 'qwertpoiuyt'
@@ -17,7 +17,6 @@ app.config['SQLALCHEMT_DATABASE_URL'] = \
         servidor = 'localhost',
         database = 'jogoteca'
     )
-
 
 
 class Jogos(db.Model):
