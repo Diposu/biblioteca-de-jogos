@@ -1,6 +1,7 @@
 import mysql.connector
 from mysql.connector import errorcode
 
+#bd ok!
 print("Conectando...")
 try:
       conn = mysql.connector.connect(
