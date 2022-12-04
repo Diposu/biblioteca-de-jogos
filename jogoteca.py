@@ -1,39 +1,41 @@
 from flask import Flask, render_template, request, redirect, session, flash, url_for
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-class Jogo:
-    def __init__(self, nome, categoria, console):
-        self.nome = nome
-        self.categoria = categoria
-        self.console = console
 
-jogo1 = Jogo ('Forza', 'Corrida', 'Multiplataforma')
-jogo2 = Jogo ('Counter-Strike: Global Offensive', 'Tiro', 'PC')
-jogo3 = Jogo ('The Last of Us', 'ação-aventura', 'PlayStation')
-lista = [jogo1, jogo2, jogo3]
-
-
-class Usuario:
-    def __init__(self, nome, nickname, senha):
-        self.nome = nome
-        self.nickname = nickname
-        self.senha = senha
-
-
-usuario1 = Usuario("pedro amorim", "bigp", "098iop")
-usuario2 = Usuario("lyank silva", "lyank", "lyly")
-usuario3 = Usuario("arthur", "dan", "morreumamando")
-
-usuarios = { usuario1.nickname : usuario1,
-             usuario2.nickname : usuario2,
-             usuario3.nickname : usuario3}
 
 app.secret_key = 'qwertpoiuyt'
 
+db = SQLAlchemy(app)
 
+app.config['SQLALCHEMT_DATABASE_URL'] = \
+    '{SGBD}://{usuario}:{senha}@{servidor}/{database}'.format(
+        SGBD = 'mysql+mysqlconnector',
+        usuario = 'root',
+        senha = 'ROOT',
+        servidor = 'localhost',
+        database = 'jogoteca'
+    )
+
+
+
+class Jogos(db.Model):
+    id = db.Column(db.Interger, primary_key = True, autoincrement = True)
+    nome = db.Column(db.String(50), nullable = False)
+    categoria = db.Column(db.String(40), nullable = False)
+    console = db.Column(db.String(20), nullable = False)
+    def __repr__(self):
+        return '<Name %r>' % self.name
+class Usuario(db.Model):
+    nickname = db.Column(db.String(20), primary_key = True)
+    nome = db.Column(db.String(20), nullable = False)
+    senha = db.Column(db.String(100), nullable = False)
+    def __repr__(self):
+        return '<Name %r>' % self.name
 @app.route('/')
 def index():
+    lista = Jogos.query.order_by(Jogos.id)
     return render_template('lista.html', titulo='Games', jogos=lista)
 
 @app.route('/novo')
@@ -44,17 +46,19 @@ def novo():
 
 @app.route('/criar', methods= ['POST'])
 def criar():
+    lista = Jogos.query.order_by(Jogos.id)
     nome = request.form['nome']
     categoria = request.form['categoria']
     console = request.form['console']
-    jogo = Jogo(nome, categoria, console)
+    jogo = Jogos(nome, categoria, console)
     lista.append(jogo)
     return redirect(url_for('index'))
 
 @app.route('/autenticar', methods=['POST', ])
 def autenticar():
-    if request.form['usuario'] in usuarios:
-        usuario = usuarios[request.form['usuario']]
+    usuario = Usuario.query.filter_by(nickname = request.form['usuario']).first()
+    if usuario:
+        usuario = usuario[request.form['usuario']]
         if request.form['senha'] == usuario.senha:
             session['usuario_logado'] = usuario.nickname
             flash(usuario.nickname + ' logado com sucesso!')
