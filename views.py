@@ -1,11 +1,13 @@
-from flask import Flask, render_template, request, redirect, session, flash, url_for
+from flask import Flask, render_template, request, redirect, session, flash, url_for, send_from_directory
 from jogoteca import app, db
-from models import Jogos,Usuarios
+from models import Jogos, Usuarios
+
 
 @app.route('/')
 def index():
     lista = Jogos.query.order_by(Jogos.id)
     return render_template('lista.html', titulo='Jogos', jogos=lista)
+
 
 @app.route('/novo')
 def novo():
@@ -13,7 +15,8 @@ def novo():
         return redirect(url_for('login', proxima=url_for('novo')))
     return render_template('novo.html', titulo='Novo Jogo')
 
-@app.route('/criar', methods=['POST',])
+
+@app.route('/criar', methods=['POST', ])
 def criar():
     nome = request.form['nome']
     categoria = request.form['categoria']
@@ -33,9 +36,10 @@ def criar():
     upload_path = app.config['UPLOAD_PATH']
     arquivo.save(f'{upload_path}/capa{novo_jogo.id}.jpg')
 
-
     return redirect(url_for('index'))
-@app.route('/atualizar', methods=['POST',])
+
+
+@app.route('/atualizar', methods=['POST', ])
 def atualizar():
     jogo = Jogos.query.filter_by(id=request.form['id']).first()
     jogo.nome = request.form['nome']
@@ -45,6 +49,7 @@ def atualizar():
     db.session.add(jogo)
     db.session.commit()
     return redirect(url_for('index'))
+
 
 @app.route('/deletar/<int:id>')
 def deletar(id):
@@ -71,7 +76,8 @@ def login():
     proxima = request.args.get('proxima')
     return render_template('login.html', proxima=proxima)
 
-@app.route('/autenticar', methods=['POST',])
+
+@app.route('/autenticar', methods=['POST', ])
 def autenticar():
     usuario = Usuarios.query.filter_by(nickname=request.form['usuario']).first()
     if usuario:
@@ -84,11 +90,13 @@ def autenticar():
         flash('Usuário não logado.')
         return redirect(url_for('login'))
 
+
 @app.route('/logout')
 def logout():
     session['usuario_logado'] = None
     flash('Logout efetuado com sucesso!')
     return redirect(url_for('index'))
+
 
 @app.route('/uploads/<nome_arquivo>')
 def imagem(nome_arquivo):
