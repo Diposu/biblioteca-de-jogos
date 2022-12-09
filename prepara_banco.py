@@ -61,6 +61,7 @@ usuarios = [
       ("Bruno Divino", "BD", "alohomora"),
       ("Camila Ferreira", "Mila", "paozinho"),
       ("Guilherme Louro", "Cake", "python_eh_vida")
+      ("Pedro Amorim", "bigp", "pedro123")
 ]
 cursor.executemany(usuario_sql, usuarios)
 
